@@ -83,28 +83,28 @@ done
 ftp -n -i $FtpHOST << _EOF_
         user $FtpUSER $FtpPASS
         cd "$DEST_DIR"
-        ls -1 remote_backup_raw.txt
+        ls -1 $SRC_DIR"remote_backup_raw.txt"
         quit
 _EOF_
 
-more remote_backup_raw.txt | awk -F" " '{print $9}' > remote_backup.txt
-NB_REMOTE=$(more remote_backup.txt  | wc -l)
+more $SRC_DIR"remote_backup_raw.txt" | awk -F" " '{print $9}' > $SRC_DIR"remote_backup.txt"
+NB_REMOTE=$(more $SRC_DIR"remote_backup.txt"  | wc -l)
 NB_TO_DEL_REMOTE=$(echo "$NB_REMOTE-$NB_BACKUP_REMOTE" | bc)
 
 for i in $(seq 1 $NB_TO_DEL_REMOTE)
 do
-        TO_DEL=$(head -n 1 remote_backup.txt)   #first line of the file
+        TO_DEL=$(head -n 1 $SRC_DIR"remote_backup.txt")   #first line of the file
         ftp -n -i $FtpHOST << _EOF_
                 user $FtpUSER $FtpPASS
                 delete "$DEST_DIR$TO_DEL"
                 quit
 _EOF_
         # we delete the first line of the file
-        sed 1d remote_backup.txt > remote_backup2.txt
-        mv remote_backup2.txt remote_backup.txt
+        sed 1d $SRC_DIR"remote_backup.txt" > $SRC_DIR"remote_backup2.txt"
+        mv $SRC_DIR"remote_backup2.txt" $SRC_DIR"remote_backup.txt"
 done
 
 # clean the temp files
-rm remote_backup*
+rm $SRC_DIR"remote_backup"*
 
 echo "Done..."
